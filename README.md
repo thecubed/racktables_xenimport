@@ -5,6 +5,11 @@ Import your Xen virtual machines into RackTables!
 
 By Tyler Montgomery -  <tylerfixer@thecubed.com>
 
+---
+[![Preview Image](http://i.imgur.com/P3j53Frl.png)](http://i.imgur.com/P3j53Fr.png)
+
+---
+
 Requirements
 ---
  - cURL
