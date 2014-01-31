@@ -14,6 +14,7 @@ $tab['depot']['xen_import'] = 'Xen VM Import';
 $tabhandler['depot']['xen_import'] = 'showImportTab';
 
 $ophandler['depot']['xen_import']['discoverVMs'] = 'discoverVMs';
+$ophandler['depot']['xen_import']['importVMs'] = 'importVMs';
 $ophandler['depot']['xen_import']['clearList'] = 'clearList';
 
 $sesskey = 'xenImport';
@@ -170,6 +171,56 @@ function discoverVMs() {
 
 }
 
+/** Import selected virtual machines
+*/
+function importVMs() {
+	global $sesskey;
+	session_start();
+
+	// split up our weird path separator from the checkboxes
+	foreach ($_POST['import'] as $vmpath) {
+		$poolname = strstr($vmpath, "!@!", true);
+		$vmname = substr(strstr($vmpath, "!@!"), 3);
+
+		$toImport[$poolname][] = $vmname;
+	} 
+
+	// for every pool with vms marked to import
+	foreach (array_keys($toImport) as $curpool) {
+
+		// find index of associated VM pool in session
+		$poolID = 0;
+		foreach ($_SESSION[$sesskey]['vms'] as $key => $pool) {
+			if ($pool['name'] == $curpool) {
+				
+				// this pool matches the pool we're working on
+				$poolID = $key;
+				break;
+			}
+		}
+
+		// now that we've found the pool ID, we need to find the vm index in the array
+		$vmID = 0;
+		foreach ($toImport[$curpool] as $vmName) {
+			foreach ($_SESSION[$sesskey]['vms'][$poolID]['virtuals'] as $vmkey => $vmdata) {
+				
+				// this VM has the same name as the VM we're searching for, save it's ID
+				if ($vmdata['name'] == $vmName){
+					$vmID = $vmkey;
+					break;
+				}
+			}
+
+		// finally, we can set this VM as importable (or errored, for now)
+		$_SESSION[$sesskey]['vms'][$poolID]['virtuals'][$vmID]['import'] = TRUE;
+
+		}
+
+	}
+	
+	// now that we know what VM's we're going to import, let's do this!
+} 
+
 /** Clear any session keys related to this app
 */
 function clearList() {
@@ -210,6 +261,16 @@ function validatePost($postKeys){
 	}
 	return $errors;
 
+}
+
+/** Trim string to length and add elipses if too long
+*/
+function trimstring($str, $len) {
+	if (strlen($str) > $len) {
+		return substr($str,0,($len -4)). "[..]";
+	} else {
+		return $str;
+	}
 }
 
 ?>

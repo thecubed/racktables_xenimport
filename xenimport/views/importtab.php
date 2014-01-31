@@ -32,6 +32,9 @@ $start = $time;
 	.xvmimport .buttons input {
 		width: 70px;
 	}
+	.xvmimport .error {
+		background-color: red;
+	}
 
 	.xvmimport .tabs {
 	  min-width: 320px;
@@ -236,6 +239,7 @@ $start = $time;
 				<th><input type="checkbox" name="checkAll" onclick="boxes = document.getElementsByClassName('importCheckbox'); for (var i=0;i < boxes.length;i++) {boxes[i].checked = this.checked};"></th>
 				<th>VM Name</th>
 				<th>IP Address</th>
+				<th>Description</th>
 				<th>Guest OS</th>
 				<th>VM UUID</th>
 			<tr>
@@ -244,18 +248,19 @@ $start = $time;
 				foreach ($xtpl['vms'] as $vmpool) {
 			?>
 				<tr>
-					<th colspan="5"><?php echo $vmpool['name'] ?></th>
+					<th colspan="6">Pool: <?php echo $vmpool['name'] ?></th>
 				</tr>
 
 				<?php
 					foreach ($vmpool['virtuals'] as $vm) {
 				?>
 
-					<tr>
+					<tr class="<?php if (isset($vm['error'])) { echo 'error'; }?>">
 						<td class="center"><input type="checkbox" name="import[]" value="<?php echo $vmpool['name']."!@!".$vm['name'] ?>" class="importCheckbox"></td>
 						<td><?php echo $vm['name'] ?></td>
 						<td><?php echo $vm['ip'] ?></td>
-						<td><?php echo $vm['ostype'] ?></td>
+						<td><?php echo trimstring($vm['description'],60) ?></td>
+						<td><?php echo trimstring($vm['ostype'],35) ?></td>
 						<td><?php echo $vm['vmuuid'] ?></td>
 					</tr>
 
@@ -290,7 +295,7 @@ $start = $time;
 		<br><br>
 		<strong>Click 'import' to begin the import process</strong><br>
 		or select 'clear' to clear the list of importable VMs<br><br>
-		<input type="submit" name="import" value="Import selected VMs and pools">
+		<input type="submit" name="doImport" value="Import selected VMs and pools">
 		<input type="button" name="clear" value="Clear discovered VMs" onclick="location.href = '?module=redirect&page=depot&tab=xen_import&op=clearList'; return false;">
 		</form>
 		<br><br>

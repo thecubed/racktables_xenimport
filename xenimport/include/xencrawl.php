@@ -43,6 +43,7 @@ class XenCrawler {
 				// Create the info array
 				$vmInfo = array(
 					"name" => $record['name_label'],
+					"description" => $record['name_description'],
 					"vmuuid" => $record['uuid']
 				);
 
